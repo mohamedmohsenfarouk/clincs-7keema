@@ -202,26 +202,31 @@ if (empty($this->session->user_id)) {?>
 
                                     <!-- <select id="select-provider" class="form-control" size="3"> -->
                                     <div class="col" id="provider-div">
-                                   <?php foreach ($available_providers as $provider) {?>
+                                        <?php foreach ($available_providers as $provider) {?>
                                         <div class="form-group provider-card">
-                                        <label for="select-provider-<?php echo $provider['id'] ?>">Dr/ <?php echo $provider['first_name'] . " " . $provider['last_name'] ?></label>
-                                            <input type="radio" name="select-provider" data-name="<?php echo $provider['first_name'] ?>"
-                                                value="<?php echo $provider['id'] ?>" id="select-provider-<?php echo $provider['id'] ?>"
+                                            <label for="select-provider-<?php echo $provider['id'] ?>">Dr/
+                                                <?php echo $provider['first_name'] . " " . $provider['last_name'] ?></label>
+                                            <input type="radio" name="select-provider"
+                                                data-name="<?php echo $provider['first_name'] ?>"
+                                                value="<?php echo $provider['id'] ?>"
+                                                id="select-provider-<?php echo $provider['id'] ?>"
                                                 style="margin:8px;float:left;" checked>
                                             <div class="card">
                                                 <div class="card-body">
                                                     <h5 class="card-title">
-                                                    <img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">
+                                                        <img src="./assets/img/map-marker-alt-solid.svg"
+                                                            class="card-custom-icon">
                                                         <?php echo $provider['address'] . ', ' . $provider['city'] . ', ' . $provider['state'] ?>
                                                     </h5>
                                                     <p class="card-text">
-                                                    <img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">
+                                                        <img src="./assets/img/phone-alt-solid.svg"
+                                                            class="card-custom-icon">
                                                         <?php echo $provider['phone_number'] ?>
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
-                                    <?php }?>
+                                        <?php }?>
                                     </div>
 
                                     <!-- </select> -->
@@ -411,7 +416,7 @@ if (empty($this->session->user_id)) {?>
 
                 <!-- APPOINTMENT DATA CONFIRMATION 4-->
 
-                <div id="wizard-frame-4" class="wizard-frame" style="display:none;">
+                <!-- <div id="wizard-frame-4" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
 
                         <h2 class="frame-title"><?=lang('customer_information')?></h2>
@@ -486,12 +491,12 @@ if (empty($this->session->user_id)) {?>
                             <i class="fas fa-chevron-right ml-2"></i>
                         </button>
                     </div>
-                </div>
+                </div> -->
 
 
-                <!-- APPOINTMENT DATA CONFIRMATION 5-->
+                <!-- APPOINTMENT DATA CONFIRMATION 4-->
 
-                <div id="wizard-frame-5" class="wizard-frame" style="display:none;">
+                <div id="wizard-frame-4" class="wizard-frame" style="display:none;">
                     <div class="frame-container">
                         <h2 class="frame-title"><?=lang('appointment_confirmation')?></h2>
                         <div class="row frame-content">
@@ -516,8 +521,8 @@ if (empty($this->session->user_id)) {?>
                     </div>
 
                     <div class="command-buttons">
-                        <button type="button" id="button-back-5" class="btn button-back btn-outline-secondary"
-                            data-step_index="5">
+                        <button type="button" id="button-back-4" class="btn button-back btn-outline-secondary"
+                            data-step_index="4">
                             <i class="fas fa-chevron-left mr-2"></i>
                             <?=lang('back')?>
                         </button>
@@ -615,30 +620,35 @@ $user_customer_query = $this->db->select('*')->from('ea_users')->where('id', $th
                                     <input type="radio" name="eyes" id="both_eyes" value="Both Eyes">
                                 </div>
                                 <label for="provider-div">
-                                        <strong><?=lang('provider')?></strong>
+                                    <strong><?=lang('provider')?></strong>
                                 </label>
                                 <div class="col" id="provider-div">
-                                   <?php foreach ($available_providers as $provider) {?>
+                                    <?php foreach ($available_providers as $provider) {?>
                                     <div class="form-group provider-card">
-                                        <label for="select-provider-<?php echo $provider['id'] ?>">Dr/ <?php echo $provider['first_name'] . " " . $provider['last_name'] ?></label>
-                                            <input type="radio" name="select-provider" data-name="<?php echo $provider['first_name'] ?>"
-                                                value="<?php echo $provider['id'] ?>" id="select-provider-<?php echo $provider['id'] ?>"
-                                                style="margin:8px;float:left;" checked>
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">
-                                                    <img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">
-                                                        <?php echo $provider['address'] . ', ' . $provider['city'] . ', ' . $provider['state'] ?>
-                                                    </h5>
-                                                    <p class="card-text">
-                                                    <img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">
-                                                        <?php echo $provider['phone_number'] ?>
-                                                    </p>
-                                                </div>
+                                        <label for="select-provider-<?php echo $provider['id'] ?>">Dr/
+                                            <?php echo $provider['first_name'] . " " . $provider['last_name'] ?></label>
+                                        <input type="radio" name="select-provider"
+                                            data-name="<?php echo $provider['first_name'] ?>"
+                                            value="<?php echo $provider['id'] ?>"
+                                            id="select-provider-<?php echo $provider['id'] ?>"
+                                            style="margin:8px;float:left;" checked>
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">
+                                                    <img src="./assets/img/map-marker-alt-solid.svg"
+                                                        class="card-custom-icon">
+                                                    <?php echo $provider['address'] . ', ' . $provider['city'] . ', ' . $provider['state'] ?>
+                                                </h5>
+                                                <p class="card-text">
+                                                    <img src="./assets/img/phone-alt-solid.svg"
+                                                        class="card-custom-icon">
+                                                    <?php echo $provider['phone_number'] ?>
+                                                </p>
                                             </div>
                                         </div>
-                                    <?php }?>
                                     </div>
+                                    <?php }?>
+                                </div>
 
                                 <div id="service-description"></div>
                             </div>
@@ -726,7 +736,7 @@ $user_customer_query = $this->db->select('*')->from('ea_users')->where('id', $th
                                 </div>
                             </div>
 
-                            <div class="col-12 col-md-6">
+                            <!-- <div class="col-12 col-md-6">
                                 <div class="form-group">
                                     <label for="address" class="control-label">
                                         <?=lang('address')?>
@@ -752,7 +762,7 @@ $user_customer_query = $this->db->select('*')->from('ea_users')->where('id', $th
                                     </label>
                                     <textarea id="notes" maxlength="500" class="form-control" rows="1"></textarea>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
 
@@ -843,7 +853,7 @@ $user_customer_query = $this->db->select('*')->from('ea_users')->where('id', $th
                 <?php }?>
                 <!-- FRAME FOOTER -->
 
-                <div id="frame-footer">
+                <!-- <div id="frame-footer">
                     <input type="hidden" name="user_id" id="user_id" value="<?=$this->session->user_id;?>">
 
                     <small>
@@ -858,7 +868,7 @@ $user_customer_query = $this->db->select('*')->from('ea_users')->where('id', $th
                             </a>
                         </span>
                     </small>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
