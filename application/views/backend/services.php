@@ -9,6 +9,7 @@
         timeFormat: <?= json_encode($time_format) ?>,
         services: <?= json_encode($services) ?>,
         categories: <?= json_encode($categories) ?>,
+        branches: <?= json_encode($branches) ?>,
         timezones: <?= json_encode($timezones) ?>,
         user: {
             id: <?= $user_id ?>,
@@ -187,6 +188,10 @@
                         </label>
                         <textarea id="service-description" rows="4" class="form-control"></textarea>
                     </div>
+
+                    <h4><?= lang('branches') ?></h4>
+                    <div id="branches-services" class="card card-body bg-light border-light"></div>
+                          
                 </div>
             </div>
         </div>

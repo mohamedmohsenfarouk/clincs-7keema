@@ -17,6 +17,7 @@
         providers: <?= json_encode($providers) ?>,
         secretaries: <?= json_encode($secretaries) ?>,
         services: <?= json_encode($services) ?>,
+        branches: <?= json_encode($branches) ?>,
         timezones: <?= json_encode($timezones) ?>,
         workingPlan: <?= json_encode(json_decode($working_plan)) ?>,
         workingPlanExceptions: <?= json_encode(json_decode($working_plan_exceptions)) ?>,
@@ -279,6 +280,12 @@
 
                                     <h4><?= lang('services') ?></h4>
                                     <div id="provider-services" class="card card-body bg-light border-light"></div>
+                               
+                                    <br>
+
+                                    <h4><?= lang('branches') ?></h4>
+                                    <div id="branches-services" class="card card-body bg-light border-light"></div>
+                     
                                 </div>
                             </div>
                         </div>

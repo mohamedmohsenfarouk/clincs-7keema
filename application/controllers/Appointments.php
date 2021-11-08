@@ -30,6 +30,7 @@ class Appointments extends EA_Controller
         $this->load->model('appointments_model');
         $this->load->model('providers_model');
         $this->load->model('admins_model');
+        $this->load->model('branches_model');
         $this->load->model('secretaries_model');
         $this->load->model('services_model');
         $this->load->model('customers_model');
@@ -59,7 +60,6 @@ class Appointments extends EA_Controller
                 redirect('installation/index');
                 return;
             }
-
             $available_services = $this->services_model->get_available_services();
             $available_providers = $this->providers_model->get_available_providers();
             $company_name = $this->settings_model->get_setting('company_name');
@@ -76,6 +76,10 @@ class Appointments extends EA_Controller
             $privacy_policy_content = $this->settings_model->get_setting('privacy_policy_content');
             $display_any_provider = $this->settings_model->get_setting('display_any_provider');
             $timezones = $this->timezones->to_array();
+            $available_branches = $this->branches_model->get_available_branches();
+            $services_batch = $this->services_model->get_batch();
+            // echo '<pre>';
+            // var_dump($available_services); exit;
 
             // Remove the data that are not needed inside the $available_providers array.
             // foreach ($available_providers as $index => $provider) {
@@ -170,6 +174,9 @@ class Appointments extends EA_Controller
                 'privacy_policy_content' => $privacy_policy_content,
                 'timezones' => $timezones,
                 'display_any_provider' => $display_any_provider,
+                'available_branches' => $available_branches,
+                'services_batch' => $services_batch,
+
             ];
         } catch (Exception $exception) {
             $variables['exceptions'][] = $exception;

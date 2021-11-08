@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -9,7 +9,7 @@
  * @since       v1.0.0
  * ---------------------------------------------------------------------------- */
 
-(function () {
+(function() {
 
     'use strict';
 
@@ -25,7 +25,7 @@
         this.filterLimit = 20;
     }
 
-    ServicesHelper.prototype.bindEventHandlers = function () {
+    ServicesHelper.prototype.bindEventHandlers = function() {
         var instance = this;
 
         /**
@@ -33,7 +33,7 @@
          *
          * @param {jQuery.Event} event
          */
-        $('#services').on('submit', '#filter-services form', function (event) {
+        $('#services').on('submit', '#filter-services form', function(event) {
             event.preventDefault();
             var key = $('#filter-services .key').val();
             $('#filter-services .selected').removeClass('selected');
@@ -44,7 +44,7 @@
         /**
          * Event: Filter Service Cancel Button "Click"
          */
-        $('#services').on('click', '#filter-services .clear', function () {
+        $('#services').on('click', '#filter-services .clear', function() {
             $('#filter-services .key').val('');
             instance.filter('');
             instance.resetForm();
@@ -55,7 +55,7 @@
          *
          * Display the selected service data to the user.
          */
-        $('#services').on('click', '.service-row', function () {
+        $('#services').on('click', '.service-row', function() {
             if ($('#filter-services .filter').prop('disabled')) {
                 $('#filter-services .results').css('color', '#AAA');
                 return; // exit because we are on edit mode
@@ -63,7 +63,7 @@
 
             var serviceId = $(this).attr('data-id');
 
-            var service = instance.filterResults.find(function (filterResult) {
+            var service = instance.filterResults.find(function(filterResult) {
                 return Number(filterResult.id) === Number(serviceId);
             });
 
@@ -93,7 +93,7 @@
         /**
          * Event: Add New Service Button "Click"
          */
-        $('#services').on('click', '#add-service', function () {
+        $('#services').on('click', '#add-service', function() {
             instance.resetForm();
             $('#services .add-edit-delete-group').hide();
             $('#services .save-cancel-group').show();
@@ -119,7 +119,7 @@
          *
          * Cancel add or edit of a service record.
          */
-        $('#services').on('click', '#cancel-service', function () {
+        $('#services').on('click', '#cancel-service', function() {
             var id = $('#service-id').val();
             instance.resetForm();
             if (id !== '') {
@@ -130,7 +130,7 @@
         /**
          * Event: Save Service Button "Click"
          */
-        $('#services').on('click', '#save-service', function () {
+        $('#services').on('click', '#save-service', function() {
             var service = {
                 name: $('#service-name').val(),
                 duration: $('#service-duration').val(),
@@ -140,8 +140,19 @@
                 description: $('#service-description').val(),
                 location: $('#service-location').val(),
                 availabilities_type: $('#service-availabilities-type').val(),
-                attendants_number: $('#service-attendants-number').val()
+                attendants_number: $('#service-attendants-number').val(),
             };
+
+            // Include provider services.
+            service.branches = [];
+            $('input[type=checkbox]').each(function(index, checkbox) {
+                console.log(index, checkbox);
+
+                if ($(checkbox).prop('checked')) {
+                    service.branches.push($(checkbox).attr('data-id'));
+                }
+            });
+
 
             if ($('#service-category').val() !== 'null') {
                 service.id_service_categories = $('#service-category').val();
@@ -163,7 +174,7 @@
         /**
          * Event: Edit Service Button "Click"
          */
-        $('#services').on('click', '#edit-service', function () {
+        $('#services').on('click', '#edit-service', function() {
             $('#services .add-edit-delete-group').hide();
             $('#services .save-cancel-group').show();
             $('#services .record-details')
@@ -176,18 +187,17 @@
         /**
          * Event: Delete Service Button "Click"
          */
-        $('#services').on('click', '#delete-service', function () {
+        $('#services').on('click', '#delete-service', function() {
             var serviceId = $('#service-id').val();
-            var buttons = [
-                {
+            var buttons = [{
                     text: EALang.cancel,
-                    click: function () {
+                    click: function() {
                         $('#message-box').dialog('close');
                     }
                 },
                 {
                     text: EALang.delete,
-                    click: function () {
+                    click: function() {
                         instance.delete(serviceId);
                         $('#message-box').dialog('close');
                     }
@@ -202,7 +212,7 @@
     /**
      * Remove the previously registered event handlers.
      */
-    ServicesHelper.prototype.unbindEventHandlers = function () {
+    ServicesHelper.prototype.unbindEventHandlers = function() {
         $('#services')
             .off('submit', '#filter-services form')
             .off('click', '#filter-services .clear')
@@ -220,7 +230,7 @@
      * @param {Object} service Contains the service record data. If an 'id' value is provided
      * then the update operation is going to be executed.
      */
-    ServicesHelper.prototype.save = function (service) {
+    ServicesHelper.prototype.save = function(service) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_service';
 
         var data = {
@@ -229,7 +239,7 @@
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 Backend.displayNotification(EALang.service_saved);
                 this.resetForm();
                 $('#filter-services .key').val('');
@@ -242,7 +252,7 @@
      *
      * @param {Number} id Record ID to be deleted.
      */
-    ServicesHelper.prototype.delete = function (id) {
+    ServicesHelper.prototype.delete = function(id) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_service';
 
         var data = {
@@ -251,7 +261,7 @@
         };
 
         $.post(url, data)
-            .done(function () {
+            .done(function() {
                 Backend.displayNotification(EALang.service_deleted);
 
                 this.resetForm();
@@ -264,7 +274,7 @@
      *
      * @return {Boolean} Returns the validation result.
      */
-    ServicesHelper.prototype.validate = function () {
+    ServicesHelper.prototype.validate = function() {
         $('#services .has-error').removeClass('has-error');
         $('#services .form-message')
             .removeClass('alert-danger')
@@ -274,7 +284,7 @@
             // Validate required fields.
             var missingRequired = false;
 
-            $('#services .required').each(function (index, requiredField) {
+            $('#services .required').each(function(index, requiredField) {
                 if (!$(requiredField).val()) {
                     $(requiredField).closest('.form-group').addClass('has-error');
                     missingRequired = true;
@@ -304,7 +314,7 @@
     /**
      * Resets the service tab form back to its initial state.
      */
-    ServicesHelper.prototype.resetForm = function () {
+    ServicesHelper.prototype.resetForm = function() {
         $('#filter-services .selected').removeClass('selected');
         $('#filter-services button').prop('disabled', false);
         $('#filter-services .results').css('color', '');
@@ -321,6 +331,10 @@
 
         $('#services .record-details .has-error').removeClass('has-error');
         $('#services .record-details .form-message').hide();
+
+        $('#branches-services input:checkbox')
+            .prop('disabled', true)
+            .prop('checked', false);
     };
 
     /**
@@ -328,7 +342,7 @@
      *
      * @param {Object} service Contains the service record data.
      */
-    ServicesHelper.prototype.display = function (service) {
+    ServicesHelper.prototype.display = function(service) {
         $('#service-id').val(service.id);
         $('#service-name').val(service.name);
         $('#service-duration').val(service.duration);
@@ -342,6 +356,20 @@
 
         var categoryId = (service.id_service_categories !== null) ? service.id_service_categories : 'null';
         $('#service-category').val(categoryId);
+
+
+        $('#branches-services input:checkbox').prop('checked', false);
+
+        service.branches.forEach(function(branchServiceId) {
+            var $checkbox = $('#branches-services input[data-id="' + branchServiceId + '"]');
+
+            if (!$checkbox.length) {
+                return;
+            }
+
+            $checkbox.prop('checked', true);
+
+        });
     };
 
     /**
@@ -352,7 +380,7 @@
      * ID will be selected (but not displayed).
      * @param {Boolean} display Optional (false), if true then the selected record will be displayed on the form.
      */
-    ServicesHelper.prototype.filter = function (key, selectId, display) {
+    ServicesHelper.prototype.filter = function(key, selectId, display) {
         display = display || false;
 
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_filter_services';
@@ -364,12 +392,12 @@
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 this.filterResults = response;
 
                 $('#filter-services .results').empty();
 
-                response.forEach(function (service, index) {
+                response.forEach(function(service, index) {
                     $('#filter-services .results')
                         .append(ServicesHelper.prototype.getFilterHtml(service))
                         .append($('<hr/>'))
@@ -383,14 +411,14 @@
                     );
                 } else if (response.length === this.filterLimit) {
                     $('<button/>', {
-                        'type': 'button',
-                        'class': 'btn btn-block btn-outline-secondary load-more text-center',
-                        'text': EALang.load_more,
-                        'click': function () {
-                            this.filterLimit += 20;
-                            this.filter(key, selectId, display);
-                        }.bind(this)
-                    })
+                            'type': 'button',
+                            'class': 'btn btn-block btn-outline-secondary load-more text-center',
+                            'text': EALang.load_more,
+                            'click': function() {
+                                this.filterLimit += 20;
+                                this.filter(key, selectId, display);
+                            }.bind(this)
+                        })
                         .appendTo('#filter-services .results');
                 }
 
@@ -409,7 +437,7 @@
      *
      * @return {String} The HTML code that represents the record on the filter results list.
      */
-    ServicesHelper.prototype.getFilterHtml = function (service) {
+    ServicesHelper.prototype.getFilterHtml = function(service) {
         var name = service.name;
 
         var info = service.duration + ' min - ' + service.one_eye_price + ' ' + service.currency;
@@ -437,7 +465,7 @@
      * @param {Number} id The record id to be selected from the filter results.
      * @param {Boolean} display Optional (false), if true then the method will display the record on the form.
      */
-    ServicesHelper.prototype.select = function (id, display) {
+    ServicesHelper.prototype.select = function(id, display) {
         display = display || false;
 
         $('#filter-services .selected').removeClass('selected');
@@ -445,7 +473,7 @@
         $('#filter-services .service-row[data-id="' + id + '"]').addClass('selected');
 
         if (display) {
-            var service = this.filterResults.find(function (filterResult) {
+            var service = this.filterResults.find(function(filterResult) {
                 return Number(filterResult.id) === Number(id);
             });
 

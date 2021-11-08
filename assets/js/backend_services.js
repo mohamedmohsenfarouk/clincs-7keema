@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -18,7 +18,7 @@ window.BackendServices = window.BackendServices || {};
  *
  * @module BackendServices
  */
-(function (exports) {
+(function(exports) {
 
     'use strict';
 
@@ -37,11 +37,41 @@ window.BackendServices = window.BackendServices || {};
      *
      * @param {Boolean} [defaultEventHandlers] Optional (true), determines whether to bind the  default event handlers.
      */
-    exports.initialize = function (defaultEventHandlers) {
+    exports.initialize = function(defaultEventHandlers) {
         defaultEventHandlers = defaultEventHandlers || true;
 
+        // Fill the branches list boxes.
+        GlobalVariables.branches.forEach(function(branch) {
+            $('<div/>', {
+                    'class': 'checkbox',
+                    'html': [
+                        $('<div/>', {
+                            'class': 'checkbox form-check',
+                            'html': [
+                                $('<input/>', {
+                                    'class': 'form-check-input',
+                                    'type': 'checkbox',
+                                    'name': 'branch',
+                                    'id': 'branch',
+                                    'data-id': branch.id,
+                                    'prop': {
+                                        'disabled': true
+                                    }
+                                }),
+                                $('<label/>', {
+                                    'class': 'form-check-label',
+                                    'text': branch.name,
+                                    'for': branch.id
+                                })
+                            ]
+                        })
+                    ]
+                })
+                .appendTo('#branches-services');
+        });
+
         // Fill available service categories listbox.
-        GlobalVariables.categories.forEach(function (category) {
+        GlobalVariables.categories.forEach(function(category) {
             $('#service-category').append(new Option(category.name, category.id));
         });
 
@@ -69,7 +99,7 @@ window.BackendServices = window.BackendServices || {};
          *
          * Changes the displayed tab.
          */
-        $('a[data-toggle="tab"]').on('shown.bs.tab', function () {
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function() {
             if (helper) {
                 helper.unbindEventHandlers();
             }
@@ -93,7 +123,7 @@ window.BackendServices = window.BackendServices || {};
      *
      * Use this method every time a change is made to the service categories db table.
      */
-    exports.updateAvailableCategories = function () {
+    exports.updateAvailableCategories = function() {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_filter_service_categories';
 
         var data = {
@@ -102,13 +132,13 @@ window.BackendServices = window.BackendServices || {};
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 GlobalVariables.categories = response;
                 var $select = $('#service-category');
 
                 $select.empty();
 
-                response.forEach(function (category) {
+                response.forEach(function(category) {
                     $select.append(new Option(category.name, category.id));
                 });
 

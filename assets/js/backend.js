@@ -1,5 +1,5 @@
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -18,25 +18,25 @@ window.Backend = window.Backend || {};
  *
  * @module Backend
  */
-(function (exports) {
+(function(exports) {
 
     'use strict';
 
     /**
-     * Main javascript code for the backend of Easy!Appointments.
+     * Main javascript code for the backend of 7keema.
      */
-    $(function () {
+    $(function() {
         $(window)
-            .on('resize', function () {
+            .on('resize', function() {
                 Backend.placeFooterToBottom();
             })
             .trigger('resize');
 
-        $(document).ajaxStart(function () {
+        $(document).ajaxStart(function() {
             $('#loading').show();
         });
 
-        $(document).ajaxStop(function () {
+        $(document).ajaxStop(function() {
             $('#loading').hide();
         });
 
@@ -61,6 +61,7 @@ window.Backend = window.Backend || {};
     exports.PRIV_APPOINTMENTS = 'appointments';
     exports.PRIV_CUSTOMERS = 'customers';
     exports.PRIV_SERVICES = 'services';
+    exports.PRIV_BRANCHES = 'branches';
     exports.PRIV_USERS = 'users';
     exports.PRIV_SYSTEM_SETTINGS = 'system_settings';
     exports.PRIV_USER_SETTINGS = 'user_settings';
@@ -68,7 +69,7 @@ window.Backend = window.Backend || {};
     /**
      * Place the backend footer always on the bottom of the page.
      */
-    exports.placeFooterToBottom = function () {
+    exports.placeFooterToBottom = function() {
         var $footer = $('#footer');
 
         if (window.innerHeight > $('body').height()) {
@@ -94,7 +95,7 @@ window.Backend = window.Backend || {};
      * @param {Array} [actions] An array with custom actions that will be available to the user. Every array item is an
      * object that contains the 'label' and 'function' key values.
      */
-    exports.displayNotification = function (message, actions) {
+    exports.displayNotification = function(message, actions) {
         message = message || '- No message provided for this notification -';
 
         var $notification = $('#notification');
@@ -102,7 +103,7 @@ window.Backend = window.Backend || {};
         if (!actions) {
             actions = [];
 
-            setTimeout(function () {
+            setTimeout(function() {
                 $notification.fadeOut();
             }, 5000);
         }
@@ -110,33 +111,33 @@ window.Backend = window.Backend || {};
         $notification.empty();
 
         var $instance = $('<div/>', {
-            'class': 'notification alert',
-            'html': [
-                $('<button/>', {
-                    'type': 'button',
-                    'class': 'close',
-                    'data-dismiss': 'alert',
-                    'html': [
-                        $('<span/>', {
-                            'html': '&times;'
-                        })
-                    ]
-                }),
-                $('<strong/>', {
-                    'html': message
-                })
-            ]
-        })
+                'class': 'notification alert',
+                'html': [
+                    $('<button/>', {
+                        'type': 'button',
+                        'class': 'close',
+                        'data-dismiss': 'alert',
+                        'html': [
+                            $('<span/>', {
+                                'html': '&times;'
+                            })
+                        ]
+                    }),
+                    $('<strong/>', {
+                        'html': message
+                    })
+                ]
+            })
             .appendTo($notification);
 
-        actions.forEach(function (action) {
+        actions.forEach(function(action) {
             $('<button/>', {
-                'class': 'btn btn-outline-secondary btn-xs',
-                'text': action.label,
-                'on': {
-                    'click': action.function
-                }
-            })
+                    'class': 'btn btn-outline-secondary btn-xs',
+                    'text': action.label,
+                    'on': {
+                        'click': action.function
+                    }
+                })
                 .appendTo($instance);
         });
 

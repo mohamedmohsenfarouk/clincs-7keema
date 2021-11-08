@@ -433,3 +433,6 @@ body {
   margin-right: 8px;
   width: 15px;
 }
+.service-section, #button-next-1, #service-description{
+  display: none;
+}

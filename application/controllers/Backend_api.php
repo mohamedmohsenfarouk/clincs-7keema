@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -43,6 +43,7 @@ class Backend_api extends EA_Controller {
         $this->load->model('roles_model');
         $this->load->model('secretaries_model');
         $this->load->model('services_model');
+        $this->load->model('branches_model');
         $this->load->model('settings_model');
         $this->load->model('user_model');
         $this->load->library('google_sync');
@@ -929,6 +930,44 @@ class Backend_api extends EA_Controller {
     }
 
     /**
+     * Save (insert or update) branch record.
+     */
+    public function ajax_save_branch()
+    {
+        try
+        {
+            $branch = json_decode($this->input->post('branch'), TRUE);
+
+            // $required_privileges = ( ! isset($branch['id']))
+            //     ? $this->privileges[PRIV_BRANCHES]['add']
+            //     : $this->privileges[PRIV_BRANCHES]['edit'];
+            // if ($required_privileges == FALSE)
+            // {
+            //     throw new Exception('You do not have the required privileges for this task.');
+            // }
+
+            $branch_id = $this->branches_model->add($branch);
+            $response = [
+                'status' => AJAX_SUCCESS,
+                'id' => $branch_id
+            ];
+        }
+        catch (Exception $exception)
+        {
+            $this->output->set_status_header(500);
+
+            $response = [
+                'message' => $exception->getMessage(),
+                'trace' => config('debug') ? $exception->getTrace() : []
+            ];
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
+    }
+
+    /**
      * Delete service record from database.
      */
     public function ajax_delete_service()
@@ -941,6 +980,37 @@ class Backend_api extends EA_Controller {
             }
 
             $result = $this->services_model->delete($this->input->post('service_id'));
+
+            $response = $result ? AJAX_SUCCESS : AJAX_FAILURE;
+        }
+        catch (Exception $exception)
+        {
+            $this->output->set_status_header(500);
+
+            $response = [
+                'message' => $exception->getMessage(),
+                'trace' => config('debug') ? $exception->getTrace() : []
+            ];
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
+    } 
+    
+    /**
+     * Delete branch record from database.
+     */
+    public function ajax_delete_branch()
+    {
+        try
+        {
+            // if ($this->privileges[PRIV_BRANCHES]['delete'] == FALSE)
+            // {
+            //     throw new Exception('You do not have the required privileges for this task.');
+            // }
+
+            $result = $this->branches_model->delete($this->input->post('branch_id'));
 
             $response = $result ? AJAX_SUCCESS : AJAX_FAILURE;
         }
@@ -979,6 +1049,40 @@ class Backend_api extends EA_Controller {
                 'description LIKE "%' . $key . '%")';
 
             $response = $this->services_model->get_batch($where);
+        }
+        catch (Exception $exception)
+        {
+            $this->output->set_status_header(500);
+
+            $response = [
+                'message' => $exception->getMessage(),
+                'trace' => config('debug') ? $exception->getTrace() : []
+            ];
+        }
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($response));
+    }
+
+     /**
+     * Filter branch records by given key string.
+     */
+    public function ajax_filter_branches()
+    {
+        try
+        {
+            if ($this->privileges[PRIV_BRANCHES]['view'] == FALSE)
+            {
+                throw new Exception('You do not have the required privileges for this task.');
+            }
+
+            $key = $this->db->escape_str($this->input->post('key'));
+
+            $where =
+            '(name LIKE "%' . $key . '%" OR location LIKE "%' . $key . '%" ) ';
+
+            $response = $this->branches_model->get_batch($where);
         }
         catch (Exception $exception)
         {

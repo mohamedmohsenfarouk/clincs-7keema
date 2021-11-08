@@ -4,7 +4,7 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-    <title><?= isset($page_title) ? $page_title : lang('backend_section') ?> | Easy!Appointments</title>
+    <title><?= isset($page_title) ? $page_title : lang('backend_section') ?> | 7keema</title>
 
     <link rel="stylesheet" type="text/css" href="<?= asset_url('assets/ext/bootstrap/css/bootstrap.min.css') ?>">
     <link rel="stylesheet" type="text/css" href="<?= asset_url('assets/ext/jquery-ui/jquery-ui.min.css') ?>">
@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="<?= asset_url('assets/css/general.css') ?>">
 
     <link rel="icon" type="image/x-icon" href="<?= asset_url('assets/img/favicon.ico') ?>">
-    <link rel="icon" sizes="192x192" href="<?= asset_url('assets/img/logo.png') ?>">
+    <link rel="icon" sizes="192x192" href="<?= asset_url('assets/img/logo-dark.png') ?>">
 
     <script>
         // Global JavaScript Variables - Used in all backend pages.
@@ -42,7 +42,7 @@
     <div id="header-logo" class="navbar-brand">
         <img src="<?= base_url('assets/img/logo.png') ?>">
         <h6>EASY!APPOINTMENTS</h6>
-        <small>Open Source Appointment Scheduler</small>
+        <small>Appointment Scheduler</small>
     </div>
 
     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#header-menu">
@@ -79,6 +79,17 @@
                    data-tippy-content="<?= lang('manage_services_hint') ?>">
                     <i class="fas fa-business-time mr-2"></i>
                     <?= lang('services') ?>
+                </a>
+            </li>
+
+            
+            <?php $hidden = ($privileges[PRIV_BRANCHES]['view'] == TRUE) ? '' : 'd-none' ?>
+            <?php $active = ($active_menu == PRIV_BRANCHES) ? 'active' : '' ?>
+            <li class="nav-item <?= $active . $hidden ?>">
+                <a href="<?= site_url('backend/branches') ?>" class="nav-link"
+                   data-tippy-content="<?= lang('manage_branches_hint') ?>">
+                    <i class="fas fa-business-time mr-2"></i>
+                    <?= lang('branches') ?>
                 </a>
             </li>
 

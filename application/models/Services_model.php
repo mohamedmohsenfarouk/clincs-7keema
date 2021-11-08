@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -61,6 +61,7 @@ class Services_model extends EA_Model {
      */
     public function validate($service)
     {
+      
         // If record id is provided we need to check whether the record exists in the database.
         if (isset($service['id']))
         {
@@ -127,6 +128,25 @@ class Services_model extends EA_Model {
                 . $service['attendants_number']);
         }
 
+          // Validate branch services.
+    
+          if ( ! isset($service['branches']) || ! is_array($service['branches']))
+          {
+              throw new Exception('Invalid branch services given: ' . print_r($service, TRUE));
+          }
+          else
+          {
+              // Check if services are valid int values.
+              foreach ($service['branches'] as $branch_id)
+              {
+                  if ( ! is_numeric($branch_id))
+                  {
+                      throw new Exception('A branch service with invalid id was found: '
+                          . print_r($service, TRUE));
+                  }
+              }
+          }
+
         return TRUE;
     }
 
@@ -141,10 +161,16 @@ class Services_model extends EA_Model {
      */
     protected function insert($service)
     {
+        $branches = $service['branches'];
+        unset($service['branches']);
+
         if ( ! $this->db->insert('services', $service))
         {
             throw new Exception('Could not insert service record.');
         }
+
+        $service['id'] = $this->db->insert_id();
+        $this->save_branches($branches, $service['id']);
         return (int)$this->db->insert_id();
     }
 
@@ -157,10 +183,44 @@ class Services_model extends EA_Model {
      */
     protected function update($service)
     {
+        $branches = $service['branches'];
+        unset($service['branches']);
+
         $this->db->where('id', $service['id']);
         if ( ! $this->db->update('services', $service))
         {
             throw new Exception('Could not update service record');
+        }
+
+        $this->save_branches($branches, $service['id']);
+
+    }
+
+
+
+    protected function save_branches($branches, $service_id)
+    {
+        // Validate method arguments.
+        if ( ! is_array($branches))
+        {
+            throw new Exception('Invalid argument type $branches: ' . $branches);
+        }
+
+        if ( ! is_numeric($service_id))
+        {
+            throw new Exception('Invalid argument type $service_id: ' . $service_id);
+        }
+
+        // Save provider services in the database (delete old records and add new).
+        $this->db->delete('services_branches', ['id_services' => $service_id]);
+
+        foreach ($branches as $branch_id)
+        {
+            $service_branches = [
+                'id_branches' => $branch_id,
+                'id_services' => $service_id
+            ];
+            $this->db->insert('services_branches', $service_branches);
         }
     }
 
@@ -348,7 +408,23 @@ class Services_model extends EA_Model {
             $this->db->order_by($order_by);
         }
 
-        return $this->db->get('services', $limit, $offset)->result_array();
+        $batch = $this->db->get('services', $limit, $offset)->result_array();
+
+         // Include each provider services and settings.
+         foreach ($batch as &$service)
+         {
+             // branches
+             $branches = $this->db->get_where('services_branches',
+                 ['id_services' => $service['id']])->result_array();
+                  
+             $service['branches'] = [];
+             foreach ($branches as $branch)
+             {
+                 $service['branches'][] = $branch['id_branches'];
+             }
+          
+        }
+        return $batch;
     }
 
     /**
@@ -359,16 +435,37 @@ class Services_model extends EA_Model {
     public function get_available_services()
     {
         $this->db->distinct();
-        return $this->db
+        
+        $this->db
             ->select('services.*, service_categories.name AS category_name, '
-                . 'service_categories.id AS category_id')
+                . 'service_categories.id AS category_id, services_branches.id_branches as services_branches')
             ->from('services')
             ->join('services_providers',
                 'services_providers.id_services = services.id', 'inner')
+            ->join('services_branches',
+                'services_branches.id_services = services.id', 'inner')
             ->join('service_categories',
                 'service_categories.id = services.id_service_categories', 'left')
-            ->order_by('name ASC')
-            ->get()->result_array();
+            ->order_by('name ASC');
+
+        $services = $this->db->get()->result_array();
+
+        
+        // Include each provider services and settings.
+        foreach ($services as &$service)
+        {
+            // branches
+            $branches = $this->db->get_where('services_branches', ['id_services' => $service['id']])->result_array();
+
+            $service['branches'] = [];
+            foreach ($branches as $branch)
+            {
+                $service['branches'][] = $branch['id_branches'];
+            }
+        }
+
+        // Return provider records.
+        return $services;
     }
 
     /**

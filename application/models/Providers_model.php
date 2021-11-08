@@ -118,6 +118,26 @@ class Providers_model extends EA_Model {
             }
         }
 
+// Validate branch provider.
+    
+if ( ! isset($provider['branches']) || ! is_array($provider['branches']))
+{
+    throw new Exception('Invalid branch providers given: ' . print_r($provider, TRUE));
+}
+else
+{
+    // Check if branches are valid int values.
+    foreach ($provider['branches'] as $branch_id)
+    {
+        if ( ! is_numeric($branch_id))
+        {
+            throw new Exception('A branch provider with invalid id was found: '
+                . print_r($provider, TRUE));
+        }
+    }
+}
+
+
         // Validate provider settings.
         if ( ! isset($provider['settings']) || count($provider['settings']) === 0
             || ! is_array($provider['settings']))
@@ -281,6 +301,8 @@ class Providers_model extends EA_Model {
         unset($provider['services']);
         $settings = $provider['settings'];
         unset($provider['settings']);
+        $branches = $provider['branches'];
+        unset($provider['branches']);
 
         // Insert provider record and save settings.
         if ( ! $this->db->insert('users', $provider))
@@ -294,6 +316,7 @@ class Providers_model extends EA_Model {
         $provider['id'] = $this->db->insert_id();
         $this->save_settings($settings, $provider['id']);
         $this->save_services($services, $provider['id']);
+        $this->save_branches($branches, $provider['id']);
 
         // Return the new record id.
         return (int)$provider['id'];
@@ -426,6 +449,8 @@ class Providers_model extends EA_Model {
         unset($provider['services']);
         $settings = $provider['settings'];
         unset($provider['settings']);
+        $branches = $provider['branches'];
+        unset($provider['branches']);
 
         if (isset($settings['password']))
         {
@@ -442,9 +467,36 @@ class Providers_model extends EA_Model {
 
         $this->save_services($services, $provider['id']);
         $this->save_settings($settings, $provider['id']);
+        $this->save_branches($branches, $provider['id']);
 
         // Return record id.
         return (int)$provider['id'];
+    }
+
+    protected function save_branches($branches, $provider_id)
+    {
+        // Validate method arguments.
+        if ( ! is_array($branches))
+        {
+            throw new Exception('Invalid argument type $branches: ' . $branches);
+        }
+
+        if ( ! is_numeric($provider_id))
+        {
+            throw new Exception('Invalid argument type $provider_id: ' . $provider_id);
+        }
+
+        // Save provider branches in the database (delete old records and add new).
+        $this->db->delete('providers_branches', ['id_users' => $provider_id]);
+
+        foreach ($branches as $branch_id)
+        {
+            $provider_branches = [
+                'id_branches' => $branch_id,
+                'id_users' => $provider_id
+            ];
+            $this->db->insert('providers_branches', $provider_branches);
+        }
     }
 
     /**
@@ -563,6 +615,16 @@ class Providers_model extends EA_Model {
             // Settings
             $provider['settings'] = $this->db->get_where('user_settings', ['id_users' => $provider['id']])->row_array();
             unset($provider['settings']['id_users']);
+
+            // branches
+            $branches = $this->db->get_where('providers_branches',
+            ['id_users' => $provider['id']])->result_array();
+             
+            $provider['branches'] = [];
+            foreach ($branches as $branch)
+            {
+                $provider['branches'][] = $branch['id_branches'];
+            }
         }
 
         // Return provider records in an array.
@@ -598,6 +660,15 @@ class Providers_model extends EA_Model {
             foreach ($services as $service)
             {
                 $provider['services'][] = $service['id_services'];
+            }
+
+            // branches
+            $branches = $this->db->get_where('providers_branches', ['id_users' => $provider['id']])->result_array();
+
+            $provider['branches'] = [];
+            foreach ($branches as $branch)
+            {
+                $provider['branches'][] = $branch['id_branches'];
             }
 
             // Settings

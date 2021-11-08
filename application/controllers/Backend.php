@@ -1,7 +1,7 @@
 <?php defined('BASEPATH') or exit('No direct script access allowed');
 
 /* ----------------------------------------------------------------------------
- * Easy!Appointments - Open Source Web Scheduler
+ * 7keema - Open Source Web Scheduler
  *
  * @package     EasyAppointments
  * @author      A.Tselegidis <alextselegidis@gmail.com>
@@ -35,6 +35,7 @@ class Backend extends EA_Controller {
         $this->load->model('user_model');
         $this->load->model('secretaries_model');
         $this->load->model('admins_model');
+        $this->load->model('branches_model');
         $this->load->library('timezones');
         $this->load->library('migration');
     }
@@ -76,6 +77,7 @@ class Backend extends EA_Controller {
         $view['require_phone_number'] = $this->settings_model->get_setting('require_phone_number');
         $view['available_providers'] = $this->providers_model->get_available_providers();
         $view['available_services'] = $this->services_model->get_available_services();
+        $view['available_branches'] = $this->branches_model->get_available_branches();
         $view['customers'] = $this->customers_model->get_batch();
         $view['calendar_view'] = ! empty($calendar_view_query_param) ? $calendar_view_query_param : $user['settings']['calendar_view'];
         $view['timezones'] = $this->timezones->to_array();
@@ -198,6 +200,7 @@ class Backend extends EA_Controller {
         $view['customers'] = $this->customers_model->get_batch();
         $view['available_providers'] = $this->providers_model->get_available_providers();
         $view['available_services'] = $this->services_model->get_available_services();
+        $view['available_branches'] = $this->branches_model->get_available_branches();
         $view['timezones'] = $this->timezones->to_array();
 
         if ($this->session->userdata('role_slug') === DB_SLUG_SECRETARY)
@@ -243,12 +246,49 @@ class Backend extends EA_Controller {
         $view['time_format'] = $this->settings_model->get_setting('time_format');
         $view['first_weekday'] = $this->settings_model->get_setting('first_weekday');
         $view['services'] = $this->services_model->get_batch();
+        $view['branches'] = $this->branches_model->get_batch();
         $view['categories'] = $this->services_model->get_all_categories();
         $view['timezones'] = $this->timezones->to_array();
         $this->set_user_data($view);
 
         $this->load->view('backend/header', $view);
         $this->load->view('backend/services', $view);
+        $this->load->view('backend/footer', $view);
+    }
+
+    /**
+     * Displays the backend branches page.
+     *
+     * Here the admin user will be able to organize and create the branches that the user will be able to book
+     * appointments in frontend.
+     *
+     * NOTICE: The branches that each provider is able to service is managed from the backend services page.
+     */
+    public function branches()
+    {
+        $this->session->set_userdata('dest_url', site_url('backend/branches'));
+
+        if ( ! $this->has_privileges(PRIV_BRANCHES))
+        {
+            return;
+        }
+
+        $view['base_url'] = config('base_url');
+        $view['page_title'] = lang('services');
+        $view['user_display_name'] = $this->user_model->get_user_display_name($this->session->userdata('user_id'));
+        $view['active_menu'] = PRIV_BRANCHES;
+        $view['company_name'] = $this->settings_model->get_setting('company_name');
+        $view['date_format'] = $this->settings_model->get_setting('date_format');
+        $view['time_format'] = $this->settings_model->get_setting('time_format');
+        $view['first_weekday'] = $this->settings_model->get_setting('first_weekday');
+        $view['services'] = $this->services_model->get_batch();
+        $view['branches'] = $this->branches_model->get_batch();
+        $view['categories'] = $this->services_model->get_all_categories();
+        $view['timezones'] = $this->timezones->to_array();
+        $this->set_user_data($view);
+
+        $this->load->view('backend/header', $view);
+        $this->load->view('backend/branches', $view);
         $this->load->view('backend/footer', $view);
     }
 
@@ -279,6 +319,7 @@ class Backend extends EA_Controller {
         $view['providers'] = $this->providers_model->get_batch();
         $view['secretaries'] = $this->secretaries_model->get_batch();
         $view['services'] = $this->services_model->get_batch();
+        $view['branches'] = $this->branches_model->get_batch();
         $view['working_plan'] = $this->settings_model->get_setting('company_working_plan');
         $view['timezones'] = $this->timezones->to_array();
         $view['working_plan_exceptions'] = '{}';

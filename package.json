@@ -39,19 +39,19 @@
   },
   "devDependencies": {
     "fs-extra": "^0.26.7",
-    "gulp": "^4.0.2",
+    "gulp": "^3.9.1",
     "gulp-changed": "^3.2.0",
     "gulp-clean-css": "^3.10.0",
     "gulp-debug": "^4.0.0",
-    "gulp-load-plugins": "^1.6.0",
-    "gulp-notify": "^3.2.0",
+    "gulp-load-plugins": "^2.0.7",
+    "gulp-notify": "^4.0.0",
     "gulp-plumber": "^1.2.1",
     "gulp-rename": "^1.4.0",
     "gulp-uglify": "^3.0.2",
     "jsdoc": "^3.6.6",
     "node-notifier": "^8.0.1",
     "plato": "^1.7.0",
-    "zip-dir": "^1.0.2"
+    "zip-dir": "^2.0.0"
   },
   "scripts": {
     "start": "npx gulp",
