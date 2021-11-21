@@ -300,9 +300,6 @@ window.FrontendBook = window.FrontendBook || {};
                         return Number(ServiceBranchId) === Number(branchId);
                     }).length > 0;
 
-
-
-
                 if (branchHasService) {
                     var all_services = GlobalVariables.availableServices.find(function(
                         availableService
@@ -326,6 +323,8 @@ window.FrontendBook = window.FrontendBook || {};
             $("#service-description").css("display", "block");
 
             var serviceId = $("#select-service").val();
+            var branchId = $("#select-branch").val();
+
             $("#provider-div").empty();
 
             GlobalVariables.availableProviders.forEach(function(provider) {
@@ -335,48 +334,52 @@ window.FrontendBook = window.FrontendBook || {};
                         return Number(providerServiceId) === Number(serviceId);
                     }).length > 0;
 
-                if (canServeService) {
-                    var html =
-                        '<div class="form-group provider-card">' +
-                        '<label for="select-provider-' +
-                        provider.id +
-                        '">' +
-                        "Dr/ " +
-                        provider.first_name +
-                        " " +
-                        provider.last_name +
-                        "</label>" +
-                        '<input type="radio" name="select-provider" id="select-provider-' +
-                        provider.id +
-                        '"' +
-                        'data-name="' +
-                        provider.first_name +
-                        " " +
-                        provider.last_name +
-                        '"value="' +
-                        provider.id +
-                        '"style="margin:8px;float:left;" checked>' +
-                        '<div class="card">' +
-                        '<div class="card-body">' +
-                        '<h5 class="card-title">' +
-                        '<img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">' +
-                        provider.address +
-                        ", " +
-                        provider.city +
-                        ", " +
-                        provider.state +
-                        "</h5>" +
-                        '<p class="card-text">' +
-                        '<img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">            ' +
-                        provider.phone_number +
-                        "</p>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>";
+                provider.branches.forEach(branch => {
 
-                    $("#provider-div").append(html);
-                }
+                    if (canServeService && branchId == branch) {
+                        var html =
+                            '<div class="form-group provider-card">' +
+                            '<label for="select-provider-' +
+                            provider.id +
+                            '">' +
+                            "Dr/ " +
+                            provider.first_name +
+                            " " +
+                            provider.last_name +
+                            "</label>" +
+                            '<input type="radio" name="select-provider" id="select-provider-' +
+                            provider.id +
+                            '"' +
+                            'data-name="' +
+                            provider.first_name +
+                            " " +
+                            provider.last_name +
+                            '"value="' +
+                            provider.id +
+                            '"style="margin:8px;float:left;" checked>' +
+                            '<div class="card">' +
+                            '<div class="card-body">' +
+                            '<h5 class="card-title">' +
+                            '<img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">' +
+                            provider.address +
+                            ", " +
+                            provider.city +
+                            ", " +
+                            provider.state +
+                            "</h5>" +
+                            '<p class="card-text">' +
+                            '<img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">            ' +
+                            provider.phone_number +
+                            "</p>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>";
+
+                        $("#provider-div").append(html);
+                    }
+                });
             });
+
 
             FrontendBookApi.getUnavailableDates(
                 $("input[name=select-provider]:checked").val(),
@@ -393,6 +396,8 @@ window.FrontendBook = window.FrontendBook || {};
             var serviceId = $("#select-service").val();
             $("#provider-div").empty();
 
+            var branchId = $("#select-branch").val();
+
             GlobalVariables.availableProviders.forEach(function(provider) {
                 // If the current provider is able to provide the selected service, add him to the list box.
                 var canServeService =
@@ -400,47 +405,50 @@ window.FrontendBook = window.FrontendBook || {};
                         return Number(providerServiceId) === Number(serviceId);
                     }).length > 0;
 
-                if (canServeService) {
-                    var html =
-                        '<div class="form-group provider-card">' +
-                        '<label for="select-provider-' +
-                        provider.id +
-                        '">' +
-                        "Dr/ " +
-                        provider.first_name +
-                        " " +
-                        provider.last_name +
-                        "</label>" +
-                        '<input type="radio" name="select-provider" id="select-provider-' +
-                        provider.id +
-                        '"' +
-                        'data-name="' +
-                        provider.first_name +
-                        " " +
-                        provider.last_name +
-                        '"value="' +
-                        provider.id +
-                        '"style="margin:8px;float:left;" checked>' +
-                        '<div class="card">' +
-                        '<div class="card-body">' +
-                        '<h5 class="card-title">' +
-                        '<img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">' +
-                        provider.address +
-                        ", " +
-                        provider.city +
-                        ", " +
-                        provider.state +
-                        "</h5>" +
-                        '<p class="card-text">' +
-                        '<img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">            ' +
-                        provider.phone_number +
-                        "</p>" +
-                        "</div>" +
-                        "</div>" +
-                        "</div>";
+                provider.branches.forEach(branch => {
 
-                    $("#provider-div").append(html);
-                }
+                    if (canServeService && branchId == branch) {
+                        var html =
+                            '<div class="form-group provider-card">' +
+                            '<label for="select-provider-' +
+                            provider.id +
+                            '">' +
+                            "Dr/ " +
+                            provider.first_name +
+                            " " +
+                            provider.last_name +
+                            "</label>" +
+                            '<input type="radio" name="select-provider" id="select-provider-' +
+                            provider.id +
+                            '"' +
+                            'data-name="' +
+                            provider.first_name +
+                            " " +
+                            provider.last_name +
+                            '"value="' +
+                            provider.id +
+                            '"style="margin:8px;float:left;" checked>' +
+                            '<div class="card">' +
+                            '<div class="card-body">' +
+                            '<h5 class="card-title">' +
+                            '<img src="./assets/img/map-marker-alt-solid.svg" class="card-custom-icon">' +
+                            provider.address +
+                            ", " +
+                            provider.city +
+                            ", " +
+                            provider.state +
+                            "</h5>" +
+                            '<p class="card-text">' +
+                            '<img src="./assets/img/phone-alt-solid.svg" class="card-custom-icon">            ' +
+                            provider.phone_number +
+                            "</p>" +
+                            "</div>" +
+                            "</div>" +
+                            "</div>";
+
+                        $("#provider-div").append(html);
+                    }
+                });
             });
 
             FrontendBookApi.getUnavailableDates(
