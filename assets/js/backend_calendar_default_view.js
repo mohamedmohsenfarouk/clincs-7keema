@@ -1854,7 +1854,7 @@ window.BackendCalendarDefaultView = window.BackendCalendarDefaultView || {};
                 }),
             }).appendTo("#select-filter-item");
         }
-        console.log(all_app);
+        // console.log(all_app);
         $('#all_app').val(all_app);
 
         // Check permissions.

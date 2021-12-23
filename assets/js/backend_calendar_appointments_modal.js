@@ -406,7 +406,7 @@ window.BackendCalendarAppointmentsModal =
                 provider.branches.forEach((branch) => {
                     // If the current provider is able to provide the selected service, add him to the listbox.
                     if (branchId == branch) {
-                        console.log(canServeService, branchId, "jkkj", branch);
+                        // console.log(canServeService, branchId, "jkkj", branch);
 
                         $("#select-provider").append(
                             new Option(

@@ -298,10 +298,10 @@ window.FrontendBook = window.FrontendBook || {};
                     service.name.includes("Examination") ||
                     service.name.includes("Labs")
                 ) {
-                    console.log(service, 211111);
+                    // console.log(service, 211111);
                     $(".eyes-section").hide();
                 } else {
-                    console.log(service, 2222);
+                    // console.log(service, 2222);
                     $(".eyes-section").show();
                 }
 
@@ -420,7 +420,7 @@ window.FrontendBook = window.FrontendBook || {};
                     service.name.includes("Examination") ||
                     service.name.includes("Labs")
                 ) {
-                    console.log(service, 211111);
+                    // console.log(service, 211111);
                     $(".eyes-section").hide();
                 } else {
                     $(".eyes-section").show();
@@ -895,11 +895,11 @@ window.FrontendBook = window.FrontendBook || {};
                 Number(service.one_eye_price) > 0
             ) {
                 if (service.name.includes("Examination")) {
-                    console.log(service, 211111);
+                    // console.log(service, 211111);
                     $(".eyes-section").hide();
                     servicePrice = service.one_eye_price;
                 } else {
-                    console.log(2222);
+                    // console.log(2222);
                     $(".eyes-section").show();
                     if ($("input:radio[name=eyes]:checked").val() == "One Eye") {
                         servicePrice = service.one_eye_price;

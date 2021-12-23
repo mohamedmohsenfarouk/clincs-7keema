@@ -146,7 +146,7 @@
             // Include provider services.
             service.branches = [];
             $('input[type=checkbox]').each(function(index, checkbox) {
-                console.log(index, checkbox);
+                // console.log(index, checkbox);
 
                 if ($(checkbox).prop('checked')) {
                     service.branches.push($(checkbox).attr('data-id'));
