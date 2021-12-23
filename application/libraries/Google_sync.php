@@ -20,7 +20,8 @@
  *
  * @package Libraries
  */
-class Google_sync {
+class Google_sync
+{
     /**
      * CodeIgniter Instance
      *
@@ -42,6 +43,7 @@ class Google_sync {
      */
     protected $service;
 
+
     /**
      * Class Constructor
      *
@@ -50,7 +52,7 @@ class Google_sync {
      */
     public function __construct()
     {
-        $this->CI =& get_instance();
+        $this->CI = &get_instance();
 
         // Initialize google client and calendar service.
         $this->client = new Google_Client();
@@ -101,8 +103,7 @@ class Google_sync {
     {
         $response = $this->client->fetchAccessTokenWithAuthCode($code);
 
-        if (isset($response['error']))
-        {
+        if (isset($response['error'])) {
             throw new Exception('Google Authentication Error (' . $response['error'] . '): ' . $response['error_description']);
         }
 
@@ -142,9 +143,11 @@ class Google_sync {
      *
      * @return Google_Service_Calendar_Event Returns the Google_Event class object.
      */
-    public function add_appointment($appointment, $provider, $service, $customer, $settings)
+    public function add_appointment($appointment, $provider,  $branch, $service, $customer, $settings)
     {
         $this->CI->load->helper('general');
+
+
 
         $event = new Google_Service_Calendar_Event();
         $event->setSummary(($service != NULL) ? $service['name'] : 'Unavailable');
@@ -169,8 +172,11 @@ class Google_sync {
         $event_provider->setEmail($provider['email']);
         $event->attendees[] = $event_provider;
 
-        if ($customer != NULL)
-        {
+        $event_branch = new Google_Branch_Calendar_EventBranch();
+        $event_branch->setSummary(($branch != NULL) ? $branch['name'] : 'Unavailable');
+        $event->attendees[] = $event_branch;
+
+        if ($customer != NULL) {
             $event_customer = new Google_Service_Calendar_EventAttendee();
             $event_customer->setDisplayName($customer['first_name'] . ' ' . $customer['last_name']);
             $event_customer->setEmail($customer['email']);
@@ -197,12 +203,14 @@ class Google_sync {
      *
      * @return Google_Service_Calendar_Event Returns the Google_Service_Calendar_Event class object.
      */
-    public function update_appointment($appointment, $provider, $service, $customer, $settings)
+    public function update_appointment($appointment, $provider,  $branch, $service, $customer, $settings)
     {
         $this->CI->load->helper('general');
 
-        $event = $this->service->events->get($provider['settings']['google_calendar'],
-            $appointment['id_google_calendar']);
+        $event = $this->service->events->get(
+            $provider['settings']['google_calendar'],
+            $appointment['id_google_calendar']
+        );
 
         $event->setSummary($service['name']);
         $event->setDescription($appointment['notes']);
@@ -225,8 +233,11 @@ class Google_sync {
         $event_provider->setEmail($provider['email']);
         $event->attendees[] = $event_provider;
 
-        if ($customer != NULL)
-        {
+        $event_branch = new Google_Branch_Calendar_EventBranch();
+        $event_branch->setSummary(($branch != NULL) ? $branch['name'] : 'Unavailable');
+        $event->attendees[] = $event_branch;
+
+        if ($customer != NULL) {
             $event_customer = new Google_Service_Calendar_EventAttendee();
             $event_customer->setDisplayName($customer['first_name'] . ' '
                 . $customer['last_name']);
@@ -234,8 +245,11 @@ class Google_sync {
             $event->attendees[] = $event_customer;
         }
 
-        $updated_event = $this->service->events->update($provider['settings']['google_calendar'],
-            $event->getId(), $event);
+        $updated_event = $this->service->events->update(
+            $provider['settings']['google_calendar'],
+            $event->getId(),
+            $event
+        );
 
         return $updated_event;
     }
@@ -249,12 +263,9 @@ class Google_sync {
      */
     public function delete_appointment($provider, $google_event_id)
     {
-        try
-        {
+        try {
             $this->service->events->delete($provider['settings']['google_calendar'], $google_event_id);
-        }
-        catch (Exception $ex)
-        {
+        } catch (Exception $ex) {
             // Event was not found on Google Calendar.
         }
     }
@@ -289,7 +300,6 @@ class Google_sync {
         $created_event = $this->service->events->insert($provider['settings']['google_calendar'], $event);
 
         return $created_event;
-
     }
 
     /**
@@ -304,8 +314,10 @@ class Google_sync {
     {
         $this->CI->load->helper('general');
 
-        $event = $this->service->events->get($provider['settings']['google_calendar'],
-            $unavailable['id_google_calendar']);
+        $event = $this->service->events->get(
+            $provider['settings']['google_calendar'],
+            $unavailable['id_google_calendar']
+        );
         $event->setDescription($unavailable['notes']);
 
         $timezone = new DateTimeZone($provider['timezone']);
@@ -318,8 +330,11 @@ class Google_sync {
         $end->setDateTime((new DateTime($unavailable['end_datetime'], $timezone))->format(DateTime::RFC3339));
         $event->setEnd($end);
 
-        $updated_event = $this->service->events->update($provider['settings']['google_calendar'],
-            $event->getId(), $event);
+        $updated_event = $this->service->events->update(
+            $provider['settings']['google_calendar'],
+            $event->getId(),
+            $event
+        );
 
         return $updated_event;
     }
@@ -332,12 +347,9 @@ class Google_sync {
      */
     public function delete_unavailable($provider, $google_event_id)
     {
-        try
-        {
+        try {
             $this->service->events->delete($provider['settings']['google_calendar'], $google_event_id);
-        }
-        catch (Exception $ex)
-        {
+        } catch (Exception $ex) {
             // Event was not found on Google Calendar.
         }
     }
@@ -392,10 +404,8 @@ class Google_sync {
     {
         $calendarList = $this->service->calendarList->listCalendarList();
         $calendars = [];
-        foreach ($calendarList->items as $google_calendar)
-        {
-            if ($google_calendar->getAccessRole() === 'reader')
-            {
+        foreach ($calendarList->items as $google_calendar) {
+            if ($google_calendar->getAccessRole() === 'reader') {
                 continue;
             }
 

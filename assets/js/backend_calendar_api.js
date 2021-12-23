@@ -18,7 +18,7 @@
  */
 window.BackendCalendarApi = window.BackendCalendarApi || {};
 
-(function (exports) {
+(function(exports) {
 
     'use strict';
 
@@ -33,7 +33,7 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
      * @param {Function} [successCallback] Optional, if defined, this function is going to be executed on post success.
      * @param {Function} [errorCallback] Optional, if defined, this function is going to be executed on post failure.
      */
-    exports.saveAppointment = function (appointment, customer, successCallback, errorCallback) {
+    exports.saveAppointment = function(appointment, customer, successCallback, errorCallback) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_appointment';
 
         var data = {
@@ -46,12 +46,12 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
         }
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 if (successCallback) {
                     successCallback(response);
                 }
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .fail(function(jqXHR, textStatus, errorThrown) {
                 if (errorCallback) {
                     errorCallback();
                 }
@@ -65,7 +65,7 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
      * @param {Function} successCallback The ajax success callback function.
      * @param {Function} errorCallback The ajax failure callback function.
      */
-    exports.saveUnavailable = function (unavailable, successCallback, errorCallback) {
+    exports.saveUnavailable = function(unavailable, successCallback, errorCallback) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_unavailable';
 
         var data = {
@@ -74,12 +74,12 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 if (successCallback) {
                     successCallback(response);
                 }
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .fail(function(jqXHR, textStatus, errorThrown) {
                 if (errorCallback) {
                     errorCallback();
                 }
@@ -95,8 +95,8 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
      * @param {Function} successCallback The ajax success callback function.
      * @param {Function} errorCallback The ajax failure callback function.
      */
-    exports.saveWorkingPlanException = function (date, workingPlanException, providerId,
-                                                 successCallback, errorCallback) {
+    exports.saveWorkingPlanException = function(date, workingPlanException, providerId,
+        successCallback, errorCallback) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_save_working_plan_exception';
 
         var data = {
@@ -107,19 +107,19 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 if (successCallback) {
                     successCallback(response);
                 }
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .fail(function(jqXHR, textStatus, errorThrown) {
                 if (errorCallback) {
                     errorCallback();
                 }
             });
     }
 
-    exports.deleteWorkingPlanException = function (date, providerId, successCallback, errorCallback) {
+    exports.deleteWorkingPlanException = function(date, providerId, successCallback, errorCallback) {
         var url = GlobalVariables.baseUrl + '/index.php/backend_api/ajax_delete_working_plan_exception';
 
         var data = {
@@ -129,12 +129,12 @@ window.BackendCalendarApi = window.BackendCalendarApi || {};
         };
 
         $.post(url, data)
-            .done(function (response) {
+            .done(function(response) {
                 if (successCallback) {
                     successCallback(response);
                 }
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
+            .fail(function(jqXHR, textStatus, errorThrown) {
                 if (errorCallback) {
                     errorCallback();
                 }

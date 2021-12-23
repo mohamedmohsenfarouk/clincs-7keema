@@ -16,6 +16,7 @@
         csrfToken: <?= json_encode($this->security->get_csrf_hash()) ?>,
         availableProviders: <?= json_encode($available_providers) ?>,
         availableServices: <?= json_encode($available_services) ?>,
+        availableBranches: <?= json_encode($available_branches) ?>,
         baseUrl: <?= json_encode($base_url) ?>,
         dateFormat: <?= json_encode($date_format) ?>,
         timeFormat: <?= json_encode($time_format) ?>,
@@ -25,6 +26,7 @@
         secretaryProviders: <?= json_encode($secretary_providers) ?>,
         calendarView: <?= json_encode($calendar_view) ?>,
         timezones: <?= json_encode($timezones) ?>,
+        servicesBatch: <?= json_encode($services_batch) ?>,
         user: {
             id: <?= $user_id ?>,
             email: <?= json_encode($user_email) ?>,
@@ -34,7 +36,7 @@
         }
     };
 
-    $(function () {
+    $(function() {
         BackendCalendar.initialize(GlobalVariables.calendarView);
     });
 </script>
@@ -43,29 +45,28 @@
     <div class="row" id="calendar-toolbar">
         <div id="calendar-filter" class="col-12 col-sm-5">
             <div class="form-group calendar-filter-items">
-                <select id="select-filter-item" class="form-control col"
-                        data-tippy-content="<?= lang('select_filter_item_hint') ?>">
+                <select id="select-filter-item" class="form-control col" data-tippy-content="<?= lang('select_filter_item_hint') ?>">
+                    <option value=""  type="all">All</option>
                 </select>
             </div>
         </div>
 
         <div id="calendar-actions" class="col-12 col-sm-7">
             <?php if (($role_slug == DB_SLUG_ADMIN || $role_slug == DB_SLUG_PROVIDER)
-                && config('google_sync_feature') == TRUE): ?>
-                <button id="google-sync" class="btn btn-primary"
-                        data-tippy-content="<?= lang('trigger_google_sync_hint') ?>">
+                && config('google_sync_feature') == TRUE
+            ) : ?>
+                <button id="google-sync" class="btn btn-primary" data-tippy-content="<?= lang('trigger_google_sync_hint') ?>">
                     <i class="fas fa-sync-alt"></i>
                     <span><?= lang('synchronize') ?></span>
                 </button>
 
-                <button id="enable-sync" class="btn btn-light" data-toggle="button"
-                        data-tippy-content="<?= lang('enable_appointment_sync_hint') ?>">
+                <button id="enable-sync" class="btn btn-light" data-toggle="button" data-tippy-content="<?= lang('enable_appointment_sync_hint') ?>">
                     <i class="fas fa-calendar-alt mr-2"></i>
                     <span><?= lang('enable_sync') ?></span>
                 </button>
             <?php endif ?>
 
-            <?php if ($privileges[PRIV_APPOINTMENTS]['add'] == TRUE): ?>
+            <?php if ($privileges[PRIV_APPOINTMENTS]['add'] == TRUE) : ?>
                 <div class="btn-group">
                     <button class="btn btn-light" id="insert-appointment">
                         <i class="fas fa-plus-square mr-2"></i>
@@ -82,8 +83,7 @@
                             <i class="fas fa-plus-square mr-2"></i>
                             <?= lang('unavailable') ?>
                         </a>
-                        <a class="dropdown-item" href="#" id="insert-working-plan-exception"
-                            <?= $this->session->userdata('role_slug') !== 'admin' ? 'hidden' : '' ?>>
+                        <a class="dropdown-item" href="#" id="insert-working-plan-exception" <?= $this->session->userdata('role_slug') !== 'admin' ? 'hidden' : '' ?>>
                             <i class="fas fa-plus-square mr-2"></i>
                             <?= lang('working_plan_exception') ?>
                         </a>
@@ -91,28 +91,27 @@
                 </div>
             <?php endif ?>
 
-            <button id="reload-appointments" class="btn btn-light"
-                    data-tippy-content="<?= lang('reload_appointments_hint') ?>">
+            <button id="reload-appointments" class="btn btn-light" data-tippy-content="<?= lang('reload_appointments_hint') ?>">
                 <i class="fas fa-sync-alt"></i>
             </button>
 
-            <?php if ($calendar_view === 'default'): ?>
-                <a class="btn btn-light" href="<?= site_url('backend?view=table') ?>"
-                   data-tippy-content="<?= lang('table') ?>">
+            <?php if ($calendar_view === 'default') : ?>
+                <a class="btn btn-light" href="<?= site_url('backend?view=table') ?>" data-tippy-content="<?= lang('table') ?>">
                     <i class="fas fa-table"></i>
                 </a>
             <?php endif ?>
 
-            <?php if ($calendar_view === 'table'): ?>
-                <a class="btn btn-light" href="<?= site_url('backend?view=default') ?>"
-                   data-tippy-content="<?= lang('default') ?>">
+            <?php if ($calendar_view === 'table') : ?>
+                <a class="btn btn-light" href="<?= site_url('backend?view=default') ?>" data-tippy-content="<?= lang('default') ?>">
                     <i class="fas fa-calendar-alt"></i>
                 </a>
             <?php endif ?>
         </div>
     </div>
 
-    <div id="calendar"><!-- Dynamically Generated Content --></div>
+    <div id="calendar">
+        <!-- Dynamically Generated Content -->
+    </div>
 </div>
 
 
@@ -138,6 +137,22 @@
                         <div class="row">
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
+                                    <label for="select-branch" class="control-label">
+                                        <?= lang('branch') ?>
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="select-branch" class="form-control">
+                                        <?php
+                                        echo '<option value="">Select Branch</option>';
+                                        foreach ($available_branches as $branch) {
+                                            echo '<option value="' . $branch['id'] . '">' . $branch['name'] . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+
+
+                                <div class="form-group service-section" style="display:none;">
                                     <label for="select-service" class="control-label">
                                         <?= lang('service') ?>
                                         <span class="text-danger">*</span>
@@ -147,25 +162,19 @@
                                         // Group services by category, only if there is at least one service
                                         // with a parent category.
                                         $has_category = FALSE;
-                                        foreach ($available_services as $service)
-                                        {
-                                            if ($service['category_id'] != NULL)
-                                            {
+                                        foreach ($available_services as $service) {
+                                            if ($service['category_id'] != NULL) {
                                                 $has_category = TRUE;
                                                 break;
                                             }
                                         }
 
-                                        if ($has_category)
-                                        {
+                                        if ($has_category) {
                                             $grouped_services = [];
 
-                                            foreach ($available_services as $service)
-                                            {
-                                                if ($service['category_id'] != NULL)
-                                                {
-                                                    if ( ! isset($grouped_services[$service['category_name']]))
-                                                    {
+                                            foreach ($available_services as $service) {
+                                                if ($service['category_id'] != NULL) {
+                                                    if (!isset($grouped_services[$service['category_name']])) {
                                                         $grouped_services[$service['category_name']] = [];
                                                     }
 
@@ -176,35 +185,27 @@
                                             // We need the uncategorized services at the end of the list so we will use
                                             // another iteration only for the uncategorized services.
                                             $grouped_services['uncategorized'] = [];
-                                            foreach ($available_services as $service)
-                                            {
-                                                if ($service['category_id'] == NULL)
-                                                {
+                                            foreach ($available_services as $service) {
+                                                if ($service['category_id'] == NULL) {
                                                     $grouped_services['uncategorized'][] = $service;
                                                 }
                                             }
 
-                                            foreach ($grouped_services as $key => $group)
-                                            {
+                                            foreach ($grouped_services as $key => $group) {
                                                 $group_label = ($key != 'uncategorized')
                                                     ? $group[0]['category_name'] : 'Uncategorized';
 
-                                                if (count($group) > 0)
-                                                {
+                                                if (count($group) > 0) {
                                                     echo '<optgroup label="' . $group_label . '">';
-                                                    foreach ($group as $service)
-                                                    {
+                                                    foreach ($group as $service) {
                                                         echo '<option value="' . $service['id'] . '">'
                                                             . $service['name'] . '</option>';
                                                     }
                                                     echo '</optgroup>';
                                                 }
                                             }
-                                        }
-                                        else
-                                        {
-                                            foreach ($available_services as $service)
-                                            {
+                                        } else {
+                                            foreach ($available_services as $service) {
                                                 echo '<option value="' . $service['id'] . '">'
                                                     . $service['name'] . '</option>';
                                             }
@@ -213,7 +214,7 @@
                                     </select>
                                 </div>
 
-                                <div class="form-group">
+                                <div class="form-group provider-section" style="display:none;">
                                     <label for="select-provider" class="control-label">
                                         <?= lang('provider') ?>
                                         <span class="text-danger">*</span>
@@ -236,8 +237,7 @@
 
                             <div class="col-12 col-sm-6">
                                 <div class="form-group">
-                                    <label for="start-datetime"
-                                           class="control-label"><?= lang('start_date_time') ?></label>
+                                    <label for="start-datetime" class="control-label"><?= lang('start_date_time') ?></label>
                                     <input id="start-datetime" class="required form-control">
                                 </div>
 
@@ -273,21 +273,17 @@
                     <fieldset>
                         <legend>
                             <?= lang('customer_details_title') ?>
-                            <button id="new-customer" class="btn btn-outline-secondary btn-sm" type="button"
-                                    data-tippy-content="<?= lang('clear_fields_add_existing_customer_hint') ?>">
+                            <button id="new-customer" class="btn btn-outline-secondary btn-sm" type="button" data-tippy-content="<?= lang('clear_fields_add_existing_customer_hint') ?>">
                                 <i class="fas fa-plus-square mr-2"></i>
                                 <?= lang('new') ?>
                             </button>
-                            <button id="select-customer" class="btn btn-outline-secondary btn-sm" type="button"
-                                    data-tippy-content="<?= lang('pick_existing_customer_hint') ?>">
+                            <button id="select-customer" class="btn btn-outline-secondary btn-sm" type="button" data-tippy-content="<?= lang('pick_existing_customer_hint') ?>">
                                 <i class="fas fa-hand-pointer mr-2"></i>
                                 <span>
                                     <?= lang('select') ?>
                                 </span>
                             </button>
-                            <input id="filter-existing-customers"
-                                   placeholder="<?= lang('type_to_filter_customers') ?>"
-                                   style="display: none;" class="input-sm form-control">
+                            <input id="filter-existing-customers" placeholder="<?= lang('type_to_filter_customers') ?>" style="display: none;" class="input-sm form-control">
                             <div id="existing-customers-list" style="display: none;"></div>
                         </legend>
 
@@ -322,12 +318,11 @@
                                 <div class="form-group">
                                     <label for="phone-number" class="control-label">
                                         <?= lang('phone_number') ?>
-                                        <?php if ($require_phone_number === '1'): ?>
+                                        <?php if ($require_phone_number === '1') : ?>
                                             <span class="text-danger">*</span>
                                         <?php endif ?>
                                     </label>
-                                    <input id="phone-number"
-                                           class="form-control <?= $require_phone_number === '1' ? 'required' : '' ?>">
+                                    <input id="phone-number" class="form-control <?= $require_phone_number === '1' ? 'required' : '' ?>">
                                 </div>
                             </div>
                             <div class="col-12 col-sm-6">
@@ -493,4 +488,3 @@
 <!-- WORKING PLAN EXCEPTIONS MODAL -->
 
 <?php require __DIR__ . '/working_plan_exceptions_modal.php' ?>
-

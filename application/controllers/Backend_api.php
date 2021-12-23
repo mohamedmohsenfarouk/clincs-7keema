@@ -175,32 +175,46 @@ class Backend_api extends EA_Controller {
                 return;
             }
 
+
+             // Get appointments
+             $record_id = $this->db->escape($this->input->post('record_id'));
+             $start_date = $this->db->escape($this->input->post('start_date'));
+             $end_date = $this->db->escape(date('Y-m-d', strtotime($this->input->post('end_date') . ' +1 day')));
+ 
+
             if ($this->input->post('filter_type') == FILTER_TYPE_PROVIDER)
             {
                 $where_id = 'id_users_provider';
-            }
-            else
-            {
-                $where_id = 'id_services';
-            }
-
-            // Get appointments
-            $record_id = $this->db->escape($this->input->post('record_id'));
-            $start_date = $this->db->escape($this->input->post('start_date'));
-            $end_date = $this->db->escape(date('Y-m-d', strtotime($this->input->post('end_date') . ' +1 day')));
-
-            $where_clause = $where_id . ' = ' . $record_id . '
+                $where_clause = $where_id . ' = ' . $record_id . '
                 AND ((start_datetime > ' . $start_date . ' AND start_datetime < ' . $end_date . ') 
                 or (end_datetime > ' . $start_date . ' AND end_datetime < ' . $end_date . ') 
                 or (start_datetime <= ' . $start_date . ' AND end_datetime >= ' . $end_date . ')) 
                 AND is_unavailable = 0
-            ';
+                ';
+            }elseif ($this->input->post('filter_type') == FILTER_TYPE_SERVICE)
+            {
+                $where_id = 'id_services';
+                $where_clause = $where_id . ' = ' . $record_id . '
+                AND ((start_datetime > ' . $start_date . ' AND start_datetime < ' . $end_date . ') 
+                or (end_datetime > ' . $start_date . ' AND end_datetime < ' . $end_date . ') 
+                or (start_datetime <= ' . $start_date . ' AND end_datetime >= ' . $end_date . ')) 
+                AND is_unavailable = 0
+                ';
+            }else
+            {
+                $response['appointments'] = $this->appointments_model->get_batch();
+
+            }
+
+           
+           
 
             $response['appointments'] = $this->appointments_model->get_batch($where_clause);
 
             foreach ($response['appointments'] as &$appointment)
             {
                 $appointment['provider'] = $this->providers_model->get_row($appointment['id_users_provider']);
+                $appointment['branch'] = $this->branches_model->get_row($appointment['id_branches']);
                 $appointment['service'] = $this->services_model->get_row($appointment['id_services']);
                 $appointment['customer'] = $this->customers_model->get_row($appointment['id_users_customer']);
             }
@@ -296,6 +310,7 @@ class Backend_api extends EA_Controller {
             $provider = $this->providers_model->get_row($appointment['id_users_provider']);
             $customer = $this->customers_model->get_row($appointment['id_users_customer']);
             $service = $this->services_model->get_row($appointment['id_services']);
+            $branch = $this->branches_model->get_row($appointment['id_branches']);
 
             $settings = [
                 'company_name' => $this->settings_model->get_setting('company_name'),
@@ -305,7 +320,7 @@ class Backend_api extends EA_Controller {
                 'time_format' => $this->settings_model->get_setting('time_format')
             ];
 
-            $this->synchronization->sync_appointment_saved($appointment, $service, $provider, $customer, $settings, $manage_mode);
+            $this->synchronization->sync_appointment_saved($appointment, $branch, $service, $provider, $customer, $settings, $manage_mode);
             $this->notifications->notify_appointment_saved($appointment, $service, $provider, $customer, $settings, $manage_mode);
 
             $response = AJAX_SUCCESS;

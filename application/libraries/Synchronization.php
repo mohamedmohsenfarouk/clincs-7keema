@@ -43,7 +43,7 @@ class Synchronization {
      * @param array $settings Required settings for the notification content.
      * @param bool|false $manage_mode True if the appointment is being edited.
      */
-    public function sync_appointment_saved($appointment, $service, $provider, $customer, $settings, $manage_mode = FALSE)
+    public function sync_appointment_saved($appointment, $branch, $service, $provider, $customer, $settings, $manage_mode = FALSE)
     {
         try
         {
@@ -65,7 +65,7 @@ class Synchronization {
                 {
                     // Add appointment to Google Calendar.
                     $google_event = $this->CI->google_sync->add_appointment($appointment, $provider,
-                        $service, $customer, $settings);
+                        $branch,$service, $customer, $settings);
                     $appointment['id_google_calendar'] = $google_event->id;
                     $this->CI->appointments_model->add($appointment);
                 }
@@ -76,7 +76,7 @@ class Synchronization {
                         ->get_value('id_google_calendar', $appointment['id']);
 
                     $this->CI->google_sync->update_appointment($appointment, $provider,
-                        $service, $customer, $settings);
+                    $branch,$service, $customer, $settings);
                 }
             }
         }

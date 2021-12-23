@@ -294,6 +294,16 @@ window.FrontendBook = window.FrontendBook || {};
 
             GlobalVariables.servicesBatch.forEach(function(service) {
                 // If the current service is in the selected branch, add him to the list box.
+                if (
+                    service.name.includes("Examination") ||
+                    service.name.includes("Labs")
+                ) {
+                    console.log(service, 211111);
+                    $(".eyes-section").hide();
+                } else {
+                    console.log(service, 2222);
+                    $(".eyes-section").show();
+                }
 
                 var branchHasService =
                     service.branches.filter(function(ServiceBranchId) {
@@ -304,16 +314,25 @@ window.FrontendBook = window.FrontendBook || {};
                     var all_services = GlobalVariables.availableServices.find(function(
                         availableService
                     ) {
-                        return Number(availableService.category_id) === Number(service.id_service_categories);
+                        return (
+                            Number(availableService.category_id) ===
+                            Number(service.id_service_categories)
+                        );
                     });
                     if (all_services.category_name == null) {
-                        all_services.category_name = "uncategorized"
+                        all_services.category_name = "uncategorized";
                     }
 
                     var html =
-                        '<optgroup label="' + all_services.category_name + '">' +
-                        '<option value="' + service.id + '">' + service.name + '</option>' +
-                        '</optgroup>';
+                        '<optgroup label="' +
+                        all_services.category_name +
+                        '">' +
+                        '<option value="' +
+                        service.id +
+                        '">' +
+                        service.name +
+                        "</option>" +
+                        "</optgroup>";
 
                     $("#select-service").append(html);
                 }
@@ -334,8 +353,7 @@ window.FrontendBook = window.FrontendBook || {};
                         return Number(providerServiceId) === Number(serviceId);
                     }).length > 0;
 
-                provider.branches.forEach(branch => {
-
+                provider.branches.forEach((branch) => {
                     if (canServeService && branchId == branch) {
                         var html =
                             '<div class="form-group provider-card">' +
@@ -380,7 +398,6 @@ window.FrontendBook = window.FrontendBook || {};
                 });
             });
 
-
             FrontendBookApi.getUnavailableDates(
                 $("input[name=select-provider]:checked").val(),
                 $(this).val(),
@@ -389,7 +406,7 @@ window.FrontendBook = window.FrontendBook || {};
             FrontendBook.updateConfirmFrame();
 
             // updateServiceDescription(serviceId, final_price);
-            updateServiceDescription(serviceId, final_price)
+            updateServiceDescription(serviceId, final_price);
         });
 
         $("#select-service").on("change", function() {
@@ -398,6 +415,17 @@ window.FrontendBook = window.FrontendBook || {};
 
             var branchId = $("#select-branch").val();
 
+            GlobalVariables.servicesBatch.forEach(function(service) {
+                if (
+                    service.name.includes("Examination") ||
+                    service.name.includes("Labs")
+                ) {
+                    console.log(service, 211111);
+                    $(".eyes-section").hide();
+                } else {
+                    $(".eyes-section").show();
+                }
+            });
             GlobalVariables.availableProviders.forEach(function(provider) {
                 // If the current provider is able to provide the selected service, add him to the list box.
                 var canServeService =
@@ -405,8 +433,7 @@ window.FrontendBook = window.FrontendBook || {};
                         return Number(providerServiceId) === Number(serviceId);
                     }).length > 0;
 
-                provider.branches.forEach(branch => {
-
+                provider.branches.forEach((branch) => {
                     if (canServeService && branchId == branch) {
                         var html =
                             '<div class="form-group provider-card">' +
@@ -867,13 +894,22 @@ window.FrontendBook = window.FrontendBook || {};
                 Number(service.id) === Number(serviceId) &&
                 Number(service.one_eye_price) > 0
             ) {
-                if ($("input:radio[name=eyes]:checked").val() == "One Eye") {
+                if (service.name.includes("Examination")) {
+                    console.log(service, 211111);
+                    $(".eyes-section").hide();
                     servicePrice = service.one_eye_price;
-                    serviceEyes = "One Eye";
                 } else {
-                    servicePrice = service.both_eyes_price;
-                    serviceEyes = "Both Eyes";
+                    console.log(2222);
+                    $(".eyes-section").show();
+                    if ($("input:radio[name=eyes]:checked").val() == "One Eye") {
+                        servicePrice = service.one_eye_price;
+                        serviceEyes = "One Eye";
+                    } else {
+                        servicePrice = service.both_eyes_price;
+                        serviceEyes = "Both Eyes";
+                    }
                 }
+
                 serviceCurrency = service.currency;
                 return false; // break loop
             }
