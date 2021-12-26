@@ -415,7 +415,7 @@ window.FrontendBook = window.FrontendBook || {};
 
             var branchId = $("#select-branch").val();
 
-            GlobalVariables.servicesBatch.forEach(function(service) {
+            GlobalVariables.availableService.forEach(function(service) {
                 if (
                     service.name.includes("Examination") ||
                     service.name.includes("Labs")
@@ -894,8 +894,9 @@ window.FrontendBook = window.FrontendBook || {};
                 Number(service.id) === Number(serviceId) &&
                 Number(service.one_eye_price) > 0
             ) {
-                if (service.name.includes("Examination")) {
-                    // console.log(service, 211111);
+                if (service.name.includes("Examination") ||
+                    service.name.includes("Labs")) {
+                    console.log(service, 211111);
                     $(".eyes-section").hide();
                     servicePrice = service.one_eye_price;
                 } else {
